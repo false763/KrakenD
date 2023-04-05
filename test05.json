@@ -1,0 +1,105 @@
+{
+  "version": 2,
+  "extra_config": {
+    "github_com/devopsfaith/krakend-circuitbreaker": {
+      "patterns": [
+        "/*"
+      ],
+      "settings": {
+        "is_open": false,
+        "timeout": "5s",
+        "max_requests": 0,
+        "sleep_window": "10s",
+        "error_percent_threshold": 50
+      }
+    }
+  },
+  "timeout": "3000ms",
+  "cache_ttl": "3600s",
+  "endpoints": [
+    {
+      "endpoint": "/eventcreated",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/events",
+          "method": "POST",
+          "extra_config": {
+            "github.com/devopsfaith/krakend-ratelimit/juju/router": {
+              "maxRate": "10-M",
+              "clientMaxRate": "10-M",
+              "strategy": "ip"
+            }
+          },
+          "body": {
+            "name": "{{.Request.Body.name}}",
+            "seatCapacity": {{.Request.Body.seatCapacity}},
+            "unitTypeCode": "{{.Request.Body.unitTypeCode}}",
+            "startAt": "{{.Request.Body.startAt}}",
+            "endAt": "{{.Request.Body.endAt}}",
+            "addressLine1": "{{.Request.Body.addressLine1}}",
+            "zipcode": "{{.Request.Body.zipcode}}",
+            "contactNumber": "{{.Request.Body.contactNumber}}",
+            "eventRoles": "{{.Request.Body.eventRoles}}",
+            "rsvpUntil": "{{.Request.Body.rsvpUntil}}",
+            "description": "{{.Request.Body.description}}",
+            "isRecommended": {{.Request.Body.isRecommended}},
+            "typeCode": "{{.Request.Body.typeCode}}",
+            "statusCode": "{{.Request.Body.statusCode}}",
+            "city": "{{.Request.Body.city}}",
+            "countryCode": "{{.Request.Body.countryCode}}",
+            "stateCode": "{{.Request.Body.stateCode}}",
+            "previousEventId": "{{.Request.Body.previousEventId}}",
+            "partyId": "{{.Request.Body.partyId}}",
+            "addressLine2": "{{.Request.Body.addressLine2}}"
+          }
+        },
+        {
+          "url_pattern": "/create-event-calendar",
+          "method": "POST",
+          "extra_config": {
+            "github.com/devopsfaith/krakend-ratelimit/juju/router": {
+              "maxRate": "10-M",
+              "clientMaxRate": "10-M",
+              "strategy": "ip"
+            }
+          },
+          "backend": [
+            {
+              "url_pattern": "/new-event",
+              "method": "POST",
+              "extra_config": {
+                "github.com/devopsfaith/krakend-ratelimit/juju/router": {
+                  "maxRate": "10-M",
+                  "clientMaxRate": "10-M",
+                  "strategy": "ip"
+                }
+              },
+              "body": {
+                "subject": "{{.ResponseBody.name}} - {{.ResponseBody.startAt}}",
+                "startTime": "{{.Request.Body.startAt}}",
+                "endTime": "{{.Request.Body.endAt}}",
+                "timeZone": "{{.Request.Body.timeZone}}",
+                "address": "{{.Request.Body.addressLine1}} {{.Request.Body.addressLine2}}",
+                "location": "{{.Request.Body.zipcode}}",
+                "attendees": [
+                  {
+                    "emailAddress": "{{index .Request.Body.attendees
+                    }}"
+                  },
+                  {
+                  "emailAddress": "{{index .Request.Body.attendees 1}}"
+                  },
+                  {
+                  "emailAddress": "{{index .Request.Body.attendees 2}}"
+                  }
+                  ],
+                  "AllowNewTimeProposals": false
+                  }
+                  }
+                  ]
+                  }
+                  ]
+                  }
+                  ]
+                  }
